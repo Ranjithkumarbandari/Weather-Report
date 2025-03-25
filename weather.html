@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather </title>
+</head>
+<body>
+    <div id="parent">
+        <form id="searchForm">
+            <input type="text" id="city" placeholder="Enter city">
+            <button type="button" id="button">Search</button>
+        </form>
+    </div>
+    <br><br>
+    
+    <div id="disp"></div>
+    <div id="cityList"></div>
+
+    <script>
+        let button = document.getElementById("button");
+        button.addEventListener("click", displayWeather);
+        let parent = document.getElementById("parent");
+        let cityArray = JSON.parse(localStorage.getItem('cityName')); 
+        let cityList = document.getElementById("cityList");
+
+     
+        function displayCities() {
+            cityList.innerHTML = ""; 
+            cityArray.forEach((city, index) => {
+                let div = document.createElement("div");
+                div.innerHTML = `
+                    City: ${city} 
+                    <button onclick="editCity(${index})">Edit</button>
+                    <button onclick="removeCity(${index})">Remove</button>
+                     <button onclick="fetchWeather('${city}')">Show Weather</button>
+                    <br><br>
+                `;
+                cityList.appendChild(div);
+            });
+        }
+
+        
+        function displayWeather() {
+            let city = document.getElementById("city").value;
+            let API_KEY = `bd5e378503939ddaee76f12ad7a97608`;
+            let BASE_URL = `https://api.openweathermap.org/data/2.5/weather`;
+            const url = `${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`;
+
+            fetch(url)
+                .then((res) => res.json())
+                .then((data) => {
+                    let div = document.createElement("div");
+                    div.innerHTML = `
+                        ID: ${data.id} <br>
+                        City: ${data.name} <br>
+                        Temperature: ${data.main.temp}°C <br>
+                        Weather: ${data.weather[0].description} <br><br><hr>
+                    `;
+                    document.getElementById("disp").innerHTML = div.innerHTML;
+
+                  
+                    cityArray.push(data.name); 
+                    localStorage.setItem('cityName', JSON.stringify(cityArray));
+                    
+                    
+                    displayCities(); 
+                })
+                .catch((error) => console.log(error));
+        }
+
+        
+        function fetchWeather(city) {
+            let API_KEY = `bd5e378503939ddaee76f12ad7a97608`;
+            let BASE_URL = `https://api.openweathermap.org/data/2.5/weather`;
+            const url = `${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`;
+
+            fetch(url)
+                .then((res) => res.json())
+                .then((data) => {
+                    let div = document.createElement("div");
+                    div.innerHTML = `
+                        ID: ${data.id} <br>
+                        City: ${data.name} <br>
+                        Temperature: ${data.main.temp}°C <br>
+                        Weather: ${data.weather[0].description} <br>
+                    `;
+                    document.getElementById("disp").innerHTML = div.innerHTML;
+                })
+                .catch((error) => console.log(error));
+        }
+
+        
+        function editCity(index) {
+            let newCity = prompt("Enter new city name", cityArray[index]);
+            if (newCity && newCity !== cityArray[index]) {
+                cityArray[index] = newCity;
+                localStorage.setItem('cityName', JSON.stringify(cityArray));
+                displayCities(); 
+            }
+        }
+
+        
+        function removeCity(index) {
+            cityArray.splice(index, 1);
+            localStorage.setItem('cityName', JSON.stringify(cityArray));
+            displayCities(); 
+        }
+
+       
+       
+
+    </script>
+</body>
+</html>

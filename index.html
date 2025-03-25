@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        h3 {
+            color: #2c3e50;
+            margin-left: 20px;
+        }
+
+        #parent {
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin: auto;
+        }
+
+        #city {
+            padding: 10px;
+            font-size: 16px;
+            width: 80%;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .weather-info {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .weather-info h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .weather-info p {
+            font-size: 16px;
+            margin: 5px 0;
+            color: #555;
+        }
+
+        #container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin: auto;
+        }
+
+        #container div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        #container button {
+            background-color: #e67e22;
+        }
+
+        #container button:hover {
+            background-color: #d35400;
+        }
+
+        #container span {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 80%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="parent">
+        <input type="text" id="city" placeholder="Enter the City">
+        <button onclick="displayWeather()">Search</button>
+    </div>
+    <h3>Recent Searches:</h3><br>
+    <div id="container"></div>
+
+    <script>
+        let StoredCity = JSON.parse(localStorage.getItem('City Name')) || [];
+
+        function displayWeather() {
+            let city = document.getElementById("city").value.trim();
+
+            const parent = document.getElementById("parent");
+            const container = document.getElementById('container');
+            container.innerHTML = '';
+            
+            // Clear the parent div to show only one weather report at a time
+            parent.innerHTML = '<input type="text" id="city" placeholder="Enter the City"><button onclick="displayWeather()">Search</button>';
+            
+            const API_KEY = 'bd5e378503939ddaee76f12ad7a97608';
+            const BASE_URL = `https://api.openweathermap.org/data/2.5/weather`;
+            let url = `${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`;
+
+            fetch(url)
+                .then((res) => res.json())
+                .then((data) => {
+                    const div = document.createElement("div");
+                    div.innerHTML = `
+
+                        <div class="weather-info">
+                            <h2>Weather in ${data.name}, ${data.sys.country}</h2>
+                            <p>Temperature: ${data.main.temp}°C</p>
+                            <p>Feels like: ${data.main.feels_like}°C</p>
+                            <p>Weather: ${data.weather[0].main} (${data.weather[0].description})</p>
+                            <p>Humidity: ${data.main.humidity}%</p>
+                            <p>Wind: ${data.wind.speed} m/s</p>
+                        </div>`;
+                    parent.appendChild(div);
+                    addToLocal(city);
+                })
+                .catch((error) => {
+                    console.log(error);
+                    alert("An error occurred while fetching weather data.");
+                });
+        }
+
+        function addToLocal(city) {
+            if (!StoredCity.includes(city)) {
+                StoredCity.push(city);
+                localStorage.setItem('City Name', JSON.stringify(StoredCity));
+            }
+            StoredCities();
+            document.getElementById('city').value = '';
+        }
+
+        function StoredCities() {
+            const container = document.getElementById('container');
+            container.innerHTML = '';
+            StoredCity.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <span>${item}</span>
+                    <button onclick="editItem(${index})">Edit</button>
+                    <button onclick="removeItem(${index})">Remove</button>
+                    <button onclick="FetchWeather('${item}')">Show Weather</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function removeItem(index) {
+            StoredCity.splice(index, 1);
+            localStorage.setItem('City Name', JSON.stringify(StoredCity));
+            StoredCities();
+        }
+
+        function editItem(index) {
+            const newCity = prompt('Update the city Name:', StoredCity[index]);
+            if (newCity && newCity.trim()) {
+                StoredCity[index] = newCity.trim();
+                localStorage.setItem('City Name', JSON.stringify(StoredCity));
+                StoredCities();
+            }
+        }
+
+        function FetchWeather(city) {
+            const API_KEY = 'bd5e378503939ddaee76f12ad7a97608';
+            const BASE_URL = `https://api.openweathermap.org/data/2.5/weather`;
+            let url = `${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`;
+
+            fetch(url)
+            .then((res) => res.json())
+            .then((data) => {
+                const parent = document.getElementById("parent");
+
+                // Clear the previous weather report before adding a new one
+                parent.innerHTML = '<input type="text" id="city" placeholder="Enter the City"><button onclick="displayWeather()">Search</button>';
+
+                const div = document.createElement("div");
+                div.innerHTML = `
+                    <div class="weather-info">
+                        <h2>Weather in ${data.name}, ${data.sys.country}</h2>
+                        <p>Temperature: ${data.main.temp}°C</p>
+                        <p>Feels like: ${data.main.feels_like}°C</p>
+                        <p>Weather: ${data.weather[0].main} (${data.weather[0].description})</p>
+                        <p>Humidity: ${data.main.humidity}%</p>
+                        <p>Wind: ${data.wind.speed} m/s</p>
+                    </div>`;
+                parent.appendChild(div);
+            })
+            .catch((error) => {
+                console.log(error);
+                alert("An error occurred while fetching weather data.");
+            });
+        }
+
+        StoredCities(); // Render stored cities on page load
+    </script>
+</body>
+</html>
