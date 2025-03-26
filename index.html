@@ -25,7 +25,8 @@
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 80%;
+            max-width: 400px;
             margin: auto;
         }
 
@@ -79,7 +80,8 @@
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 80%;
+            max-width: 400px;
             margin: auto;
         }
 
@@ -110,6 +112,85 @@
             width: 80%;
             border: 1px solid #ddd;
             border-radius: 5px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            #parent {
+                width: 90%;
+                margin-top: 30px;
+            }
+
+            .weather-info {
+                padding: 15px;
+            }
+
+            #container {
+                width: 90%;
+                margin-top: 20px;
+            }
+
+            #container div {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            #container button {
+                width: 100%;
+                margin-top: 5px;
+            }
+
+            input[type="text"] {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h3 {
+                font-size: 18px;
+            }
+
+            .weather-info h2 {
+                font-size: 20px;
+            }
+
+            .weather-info p {
+                font-size: 14px;
+            }
+
+            input[type="text"] {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            #parent {
+                width: 100%;
+                margin-top: 20px;
+            }
+
+            #container {
+                width: 100%;
+            }
+
+            #container div {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            #container button {
+                width: 100%;
+                margin-top: 5px;
+            }
         }
 
     </style>
